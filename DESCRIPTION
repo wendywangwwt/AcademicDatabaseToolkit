@@ -1,6 +1,6 @@
 Package: AcademicDatabaseToolkit
 Title: test
-Version: 0.1
+Version: 0.2
 Authors@R: 
     person("Wanting", "Wang", , "w.wang75@lse.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1548-6635"))

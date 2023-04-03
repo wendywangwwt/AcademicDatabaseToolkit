@@ -19,15 +19,17 @@ The web scrapper automatically
   - database
 - returns the results as a data frame
 
-Supported databases as of 2023-04-03, for ONE set of keywords:
+Supported databases as of 2023-04-03, for ONE or MULTIPLE sets of keywords:
 - PubMed (`pubmed`)
+
+Supported databases as of 2023-04-03, for ONE set of keywords:
 - Sage Journals (`sage_journal`)
 
 Databases that need code update as of 2023-04-03:
 - Science Direct (`science_direct`)
 - ProQuest (`proquest`)
 
-Current development work focuses on implementing the automated search of MULTIPLE sets of keywords. This is the scenario where each concept can be described with slightly or largely different words/phrases, and the need is to search for articles that has any of each concept (`or`) or involves at least one keyword from each concept (`and`).
+Current development work focuses on implementing the automated search of MULTIPLE sets of keywords. This is the scenario where each concept can be described with slightly or largely different words/phrases, and the need is to search for articles that involves at least one keyword from each concept (relationship=`or`).
 
 
 ## How to install
@@ -39,9 +41,14 @@ library(AcademicDatabaseToolkit)
 ## How to use
 
 #### param: keywords
-A string of keyword, or a vector of multiple keywords. Here is an example of multiple keywords:
+For ONE set of keywords, use a string of keyword, or a vector of multiple keywords:
 ```
-keywords <- c("decisions","decision-making","consumer behavior")
+keywords <- c("decisions","decision-making")
+```
+For MULTIPLE set of keywords, use a list where each sublist is a vector of one or multiple keywords that describes the same concept:
+```
+keywords <- list(c("decisions","decision-making"),
+                 c( "consumer behavior"))
 ```
 
 #### param: database_name
@@ -78,12 +85,6 @@ Whether to drop duplicated results or not. Default to TRUE. Duplicated results c
 ```
 df_data <- search_databases(keywords,relationship='or',database_name=database_name,no_duplicate=F,limit_per_search=300)
 ```
-
-
-## Caution
-To existing users, if there is any:  
-The code is re-factored and simplified to only do the job of database searching and data collection given ONE set of keywords (previously it was created with the assumption that TWO sets of keywords are needed, though you could skip one). Now if you have multiple sets of keywords, you will need to implement the logic to loop through all combinations and call the `search_databases` function in the loop.
-
 
 
     

@@ -17,3 +17,18 @@ test_that("limit < maxsize_db", {
                              drop_duplicate=F)
   expect_equal(nrow(df_data),limit_per_search*length(keywords))
 })
+
+
+
+test_that("remove invalid search result & shrink size of n accordingly", {
+  keywords <- list(c("social environment"),
+                   c( "mental health"),
+                   c( "young people"))
+  database_name <- 'pubmed'
+  df_data <- search_database(keywords,field='abstract',
+                             database_name=database_name,start_year=2000,end_year=2023,
+                             drop_duplicate=F)
+})
+
+
+

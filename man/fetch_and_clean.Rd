@@ -38,6 +38,7 @@ databases to search in \code{database_name}.}
 database.}
 }
 \description{
-Fetchs and cleans search results from PubMed as a dataframe. This is used by
+Fetches and cleans search results from PubMed as a dataframe. This is used by
 the main web_scrapper() function.
+If 0 search result, return an empty dataframe.
 }

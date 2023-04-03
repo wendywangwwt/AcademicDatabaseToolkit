@@ -1,8 +1,9 @@
 #' Fetch and clean search results
 #'
 #' @description
-#' Fetchs and cleans search results from PubMed as a dataframe. This is used by
+#' Fetches and cleans search results from PubMed as a dataframe. This is used by
 #' the main web_scrapper() function.
+#' If 0 search result, return an empty dataframe.
 #'
 #' @param keyword Required. A string value.
 #' @param field The field to search for the keywords. Currently support:
@@ -46,7 +47,7 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
 
     if (length(n) == 0) {
       print(paste("Total results: 0"))
-      next
+      df_db <- data.frame()
     } else {
       df_db <- parse_res_sj(url_sj, page, n, limit_per_search) %>%
         dplyr::mutate(search_term = keyword_original, database = db)
@@ -79,7 +80,7 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
       }
     } else {
       print(paste("Total results: 0"))
-      next
+      df_db <- data.frame()
     }
   } else if (db == "pubmed") {
     url_pm <- get_url(keyword_encoded, field, db, start_year=start_year, end_year=end_year, additional_args=additional_args)
@@ -96,7 +97,7 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
       }
     } else {
       print(paste("Total results: 0"))
-      next
+      df_db <- data.frame()
     }
   } else if (db == "proquest") {
     df_db <- data.frame(stringsAsFactors = F)
@@ -158,7 +159,7 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
             dplyr::mutate(search_term = keyword_original, database = db)
         } else {
           print("Total results: 0")
-          next
+          df_db <- data.frame()
         }
       }
 

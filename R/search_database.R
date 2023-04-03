@@ -1,9 +1,3 @@
-library(rvest)
-library(tidyverse)
-library(tidytext)
-library(stringr)
-
-
 l_field <- list(
   "sage_journal" = list(
     "abstract" = "abstract",

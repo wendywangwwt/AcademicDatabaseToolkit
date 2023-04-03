@@ -32,14 +32,6 @@ parse_res_pm <- function(res, n, limit_per_search) {
 
   print(glue::glue("Total pages: {num_page}"))
 
-  info_extracted <- list(
-    title = c(),
-    link = c(),
-    author = c(),
-    abstract = c(),
-    year = c(),
-    availability = rep(NA,n_expected_to_return) # PubMed response does not have article availability info
-  )
 
   count_done <- 0
   count_remain <- n_expected_to_return
@@ -48,7 +40,6 @@ parse_res_pm <- function(res, n, limit_per_search) {
   # no need to look for this info in each batch of detailed results
   ids_total <- res$esearchresult$idlist %>% unlist()
   ids <- ids_total[1:n_expected_to_return]
-  # info_extracted[["link"]] <- paste("https://www.ncbi.nlm.nih.gov/pubmed/", ids, sep = "")
 
   time_query <- Sys.time()
   for (k in 1:num_page) {
@@ -107,8 +98,15 @@ parse_res_pm <- function(res, n, limit_per_search) {
         }
 
         ids_total <- ids_total[-((k-1)*maxsize_db + idx_invalid)]
-        ids <- ids_total[1:n_expected_to_return]
+        if (n_expected_to_return > length(ids_total)){
+          n_expected_to_return <- length(ids_total)
+          n <- length(ids_total)
+          n_total <- length(ids_total)
+          count_remain <- length(ids_total)
+          limit_per_search <- length(ids_total)
 
+        }
+        ids <- ids_total[1:n_expected_to_return]
 
         while (Sys.time() - time_query < 0.5) {
           Sys.sleep(0.1)
@@ -117,8 +115,14 @@ parse_res_pm <- function(res, n, limit_per_search) {
       }
     }
 
-    # link
-    info_extracted[["link"]] <- paste("https://www.ncbi.nlm.nih.gov/pubmed/", ids, sep = "")
+    info_extracted <- list(
+      title = c(),
+      link = paste("https://www.ncbi.nlm.nih.gov/pubmed/", ids, sep = ""),
+      author = c(),
+      abstract = c(),
+      year = c(),
+      availability = rep(NA,n_expected_to_return) # PubMed response does not have article availability info
+    )
 
     # title
     info_extracted_cur[["title_cur"]] <- page_cur %>%

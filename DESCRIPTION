@@ -1,0 +1,15 @@
+Package: AcademicDatabaseToolkit
+Title: test
+Version: 0.1
+Authors@R: 
+    person("Wanting", "Wang", , "w.wang75@lse.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-1548-6635"))
+Description: test test test
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

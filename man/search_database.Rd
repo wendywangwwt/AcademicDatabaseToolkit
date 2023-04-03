@@ -15,7 +15,7 @@ search_database(
   additional_args = list(),
   limit_per_search = NULL,
   drop_duplicate = T,
-  availability_pubmed = T
+  availability_pubmed = F
 )
 }
 \arguments{

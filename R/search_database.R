@@ -78,6 +78,8 @@ subdb_pq <- c(
 #'   is available to you (TRUE) or not (FALSE). Default to FALSE. Because it has
 #'   to check each article one by one, it can be time consuming and can hit the
 #'   3 queries / sec limit.
+#'
+#' @export
 search_database <- function(keywords,
                             relationship = "or",
                             field = "abstract",

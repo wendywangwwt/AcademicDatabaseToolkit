@@ -135,11 +135,11 @@ search_database <- function(keywords,
           keyword, field, db, sdkey, drop_duplicate, limit_per_search,
           start_year, end_year, additional_args
         )
-        df_db <- rbind(df_db, df_db_kw)
+        df_db <- dplyr::bind_rows(df_db, df_db_kw)
       }
     }
 
-    df_total <- rbind(df_total, df_db)
+    df_total <- dplyr::bind_rows(df_total, df_db)
   }
 
 

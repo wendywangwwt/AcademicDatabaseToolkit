@@ -51,9 +51,13 @@ keywords <- list(c("decisions","decision-making"),
 ```
 
 #### param: database_name
-A string of database name, or a vector of multiple database names. Currently only `pubmed` is functional, so practically you can't use it on multiple databases :(
+A string of database name:
 ```
 database_name <- 'pubmed'
+```
+or a vector of multiple database names:
+```
+database_name <- c('pubmed','sage_journal')
 ```
 
 #### param: limit_per_search

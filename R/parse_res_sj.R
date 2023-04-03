@@ -80,7 +80,7 @@ parse_res_sj <- function(url, page, n, limit_per_search) {
       rvest::html_elements("div.issue-item__header") %>%
       rvest::html_element("span:nth-child(3)") %>%
       rvest::html_text()
-    info_extracted_cur[["year_cur"]] <- stringr::str_sub(year_cur, -4, -1)
+    info_extracted_cur[["year_cur"]] <- stringr::str_sub(year_cur, -4, -1) %>% as.numeric()
 
     # journal
     info_extracted_cur[['journal_cur']] <- page_cur %>%

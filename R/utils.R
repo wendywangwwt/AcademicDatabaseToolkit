@@ -76,7 +76,7 @@ get_url <- function(keyword,field,db,api_key=NULL,subdb=NULL,start_record=NULL,
 
   if (db == 'sage_journal'){
 
-    res <- glue::glue("http://journals.sagepub.com/action/doSearch?pageSize=100&ContentItemType=research-article&{additional_args}")
+    res <- glue::glue("http://journals.sagepub.com/action/doSearch?pageSize=100&{additional_args}")
 
     if (!is.null(start_year)){
       res <- glue::glue("{res}&AfterYear={start_year}")
@@ -90,7 +90,7 @@ get_url <- function(keyword,field,db,api_key=NULL,subdb=NULL,start_record=NULL,
       res <- glue::glue("{res}&field{i}={field_name}&text{i}={keyword[i]}")
     }
 
-    res <- glue::glue("{res}&ContentItemType=research-article&startPage=0") # the first page is startPage=0
+    res <- glue::glue("{res}&startPage=0") # the first page is startPage=0
 
   }else if (db == 'science_direct'){
     query <- glue::glue('{field_name}({keyword})')

@@ -45,16 +45,16 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
       # str_sub(2, -2) %>% # delete parenthese
       as.numeric()
 
-    if (length(n) == 0) {
-      print(paste("Total results: 0"))
-      df_db <- data.frame()
-    } else {
+    if (n > 0) {
       df_db <- parse_res_sj(url_sj, page, n, limit_per_search) %>%
         dplyr::mutate(search_term = keyword_original, database = db)
       if (no_duplicate) {
         title_tmp <- tolower(gsub("[^[:alnum:]]", "", df_db$title))
         df_db <- df_db[!duplicated(title_tmp), ]
       }
+    } else {
+      print(paste("Total results: 0"))
+      df_db <- data.frame()
     }
   } else if (db == "science_direct") {
     maxsize_db <- 200

@@ -21,9 +21,8 @@ The web scrapper automatically
 
 Supported databases as of 2023-04-03, for ONE or MULTIPLE sets of keywords:
 - PubMed (`pubmed`)
+- Sage Journals (`sage_journal`): note that you may want to use filter **Article Type** to include only the research articles for your work (there are other types such as review article) by `search_database(...,additional_args=list(ContentItemType='research-article'))`
 
-Supported databases as of 2023-04-03, for ONE set of keywords:
-- Sage Journals (`sage_journal`)
 
 Databases that need code update as of 2023-04-03:
 - Science Direct (`science_direct`)

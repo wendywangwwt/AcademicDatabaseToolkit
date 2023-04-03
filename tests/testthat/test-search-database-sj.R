@@ -30,3 +30,13 @@ test_that("limit > available size, i.e., get all results", {
                              drop_duplicate=F)
   # expect equal should target at the sum of n from all queries, which unfortunately is not returned atm
 })
+
+test_that("multiple sets of keywords", {
+  keywords <- list(c("built environment", "neighborhood environment", "social environment"),
+                   c( "mental health", "depression"),
+                   c( "young adults"))
+  database_name <- 'sage_journal'
+  df_data <- search_database(keywords,field='abstract',
+                             database_name=database_name,start_year=2000,end_year=2023,
+                             drop_duplicate=F)
+})

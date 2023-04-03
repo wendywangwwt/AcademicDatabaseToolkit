@@ -1,7 +1,11 @@
-# WebScrapper-for-Academic-Databases
-A web scrapper for academic databases in R/Python in the form of a (set of) function. Initially, this was built for accelerating meta-data analysis where one intends to try various combinations of different keywords in a handful of databases. Manually typing the keywords in each databases and eye-balling the resulting articles can be extremely inefficient and painful, especially when an article already seen from a previous database came up again in a new database.
+# Academic Database Toolkit
+This is a refactored & extended package of the scripts in [WebScrapper-for-Academic-Databases](https://github.com/wendywangwwt/WebScrapper-for-Academic-Databases), a side project started years ago.
 
-To address this problem, this web scrapper automatically
+This toolkit is intended to include
+- A web scrapper for academic databases in R/Python in the form of a (set of) function. Initially, this was built for accelerating meta-data analysis where one intends to try various combinations of different keywords in a handful of databases. Manually typing the keywords in each databases and eye-balling the resulting articles can be extremely inefficient and painful, especially when an article already seen from a previous database came up again in a new database, and
+- A set of useful functions to summarize, analyze, and visualize the retrieved search results.
+
+The web scrapper automatically
 - generates query based on the provided keywords
 - parses the result page (xml in PubMed for example)
 - extracts the a group of information, including
@@ -15,15 +19,25 @@ To address this problem, this web scrapper automatically
   - database
 - returns the results as a data frame
 
-Supported databases as of 2022-02-20:
+Supported databases as of 2023-04-03, for ONE set of keywords:
 - PubMed (`pubmed`)
+- Sage Journals (`sage_journal`)
 
-Databases that need code update as of 2022-02-20:
-- Sage Journal (`sage_journal`)
+Databases that need code update as of 2023-04-03:
 - Science Direct (`science_direct`)
 - ProQuest (`proquest`)
 
+Current development work focuses on implementing the automated search of MULTIPLE sets of keywords. This is the scenario where each concept can be described with slightly or largely different words/phrases, and the need is to search for articles that has any of each concept (`or`) or involves at least one keyword from each concept (`and`).
+
+
+## How to install
+```
+devtools::install_github('wendywangwwt/AcademicDatabaseToolkit')
+library(AcademicDatabaseToolkit)
+```
+
 ## How to use
+
 #### param: keywords
 A string of keyword, or a vector of multiple keywords. Here is an example of multiple keywords:
 ```
@@ -37,7 +51,7 @@ database_name <- 'pubmed'
 ```
 
 #### param: limit_per_search
-Put a limit to avoid collecting tens of thousands of results, unless that's what you want.
+Put a limit to avoid collecting tens of thousands of results, unless it is intended.
 ```
 df_data <- search_databases(keywords,database_name=database_name,limit_per_search=300)
 ```
@@ -72,10 +86,13 @@ The code is re-factored and simplified to only do the job of database searching 
 
 
 
-
-
     
 ## Change log
+2023-04-03:
+- re-factored the code into an R package that can be installed from GitHub, for pubmed & sage journals
+- added tests for pubmed and sage journals
+- updated readme
+
 2022-02-20:
 - re-factored the code (not completely) and updated the readme file
 - only pubmed passed the tests, need to check and update the interaction with other databases later

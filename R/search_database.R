@@ -2,9 +2,6 @@ library(rvest)
 library(tidyverse)
 library(tidytext)
 library(stringr)
-library(glue)
-library(assertthat)
-
 
 
 l_field <- list(
@@ -98,7 +95,7 @@ search_database <- function(keywords,
   database_name <- match.arg(database_name, vals_database_name, several.ok = T)
 
   # assert via assertthat
-  assert_that(is.list(keywords) | is.vector(keywords,mode='character'),msg="keywords should either be a list of keyword sets, or a vector of keywords as string")
+  assertthat::assert_that(is.list(keywords) | is.vector(keywords,mode='character'),msg="keywords should either be a list of keyword sets, or a vector of keywords as string")
 
   num_database <- length(database_name)
   if (is.list(keywords)){
@@ -121,8 +118,8 @@ search_database <- function(keywords,
     if (!is.list(keywords) & (relationship == "and")) {
       num_stage_cur <- num_stage_cur + 1
 
-      print(glue("\nStart current stage ({num_stage_cur}/{num_stage}):"))
-      print(glue('Keyword: {paste(keywords,collapse=", ")}; Database: {db}; Field: {field}'))
+      print(glue::glue("\nStart current stage ({num_stage_cur}/{num_stage}):"))
+      print(glue::glue('Keyword: {paste(keywords,collapse=", ")}; Database: {db}; Field: {field}'))
 
       df_db <- fetch_and_clean(keywords, field, db, sdkey, drop_duplicate, limit_per_search)
     } else {
@@ -136,8 +133,8 @@ search_database <- function(keywords,
       for (i in 1:nrow(df_keywords)) {
         num_stage_cur <- num_stage_cur + 1
 
-        print(glue("Start current stage ({num_stage_cur}/{num_stage}):"))
-        print(glue("Keyword: {df_keywords[i,] %>% unlist() %>% paste(collapse=' AND ')}; Database: {db}; Field: {field}"))
+        print(glue::glue("Start current stage ({num_stage_cur}/{num_stage}):"))
+        print(glue::glue("Keyword: {df_keywords[i,] %>% unlist() %>% paste(collapse=' AND ')}; Database: {db}; Field: {field}"))
 
         keyword <- df_keywords[i,] %>% unlist() %>% unname()
         df_db_kw <- fetch_and_clean(
@@ -165,11 +162,11 @@ search_database <- function(keywords,
         count_done <- 0
         print("Collect availability info for the remaining PubMed records")
         for (idx in pubmed_idx) {
-          page_cur <- read_html(as.character(df_total$link[idx]))
-          availability_cur <- page_cur %>% html_nodes('[class="icons portlet"]')
+          page_cur <- xml2::read_html(as.character(df_total$link[idx]))
+          availability_cur <- page_cur %>% rvest::html_nodes('[class="icons portlet"]')
           df_total$availability[idx] <- ifelse(length(availability_cur) > 0, "Y", "N")
           count_done <- count_done + 1
-          print(glue("Done: {count_done}/{length(pubmed_idx)}"))
+          print(glue::glue("Done: {count_done}/{length(pubmed_idx)}"))
         }
         closeAllConnections()
       }

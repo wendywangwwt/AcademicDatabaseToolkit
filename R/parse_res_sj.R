@@ -1,4 +1,4 @@
-library(assertthat)
+
 
 #' Parse search results from Sage Journal
 #'
@@ -51,7 +51,7 @@ parse_res_sj <- function(url, page, n, limit_per_search) {
     # if more than one page, fetch the next (now current) page using a modified url
     if (k > 1) {
       url_cur <- paste(url, k - 1, sep = "")
-      page_cur <- read_html(url_cur)
+      page_cur <- xml2::read_html(url_cur)
     }
 
     n_expected_from_webpage <- ifelse(k < num_page_total, maxsize_db, n_total %% maxsize_db)
@@ -69,48 +69,48 @@ parse_res_sj <- function(url, page, n, limit_per_search) {
 
     # title
     info_extracted_cur[["title_cur"]] <- page_cur %>%
-      html_elements("h3.issue-item__heading") %>%
-      html_text()
+      rvest::html_elements("h3.issue-item__heading") %>%
+      rvest::html_text()
 
     # link
-    info_extracted_cur[["link_cur"]] <- paste("http://journals.sagepub.com", page_cur %>% html_elements("a.sage-search-title") %>% html_attr("href"), sep = "")
+    info_extracted_cur[["link_cur"]] <- paste("http://journals.sagepub.com", page_cur %>% rvest::html_elements("a.sage-search-title") %>% rvest::html_attr("href"), sep = "")
 
     # published year
     year_cur <- page_cur %>%
-      html_elements("div.issue-item__header") %>%
-      html_element("span:nth-child(3)") %>%
-      html_text()
+      rvest::html_elements("div.issue-item__header") %>%
+      rvest::html_element("span:nth-child(3)") %>%
+      rvest::html_text()
     info_extracted_cur[["year_cur"]] <- stringr::str_sub(year_cur, -4, -1)
 
     # journal
     info_extracted_cur[['journal_cur']] <- page_cur %>%
-      html_elements("div.issue-item__row.issue-item__journal") %>%
-      html_text()
+      rvest::html_elements("div.issue-item__row.issue-item__journal") %>%
+      rvest::html_text()
 
     # availability
     availability_cur <- page_cur %>%
-      html_elements("span.issue-item-access") %>%
-      html_text()
+      rvest::html_elements("span.issue-item-access") %>%
+      rvest::html_text()
     info_extracted_cur[["availability_cur"]] <- ifelse(availability_cur %in% c("Available access", "Open Access"), "Y", "N")
 
     # author
     author_nodes_cur <- page_cur %>%
-      html_elements("div.issue-item__authors > ul")
+      rvest::html_elements("div.issue-item__authors > ul")
     for (author_node in author_nodes_cur) {
-      info_extracted_cur[["author_cur"]] <- c(info_extracted_cur[["author_cur"]], author_node %>% html_elements("li") %>% html_text() %>% paste(collapse = ", "))
+      info_extracted_cur[["author_cur"]] <- c(info_extracted_cur[["author_cur"]], author_node %>% rvest::html_elements("li") %>% rvest::html_text() %>% paste(collapse = ", "))
     }
 
     # abstract - there can be articles with NO abstract :(
     abstract_cur <- c()
     nodes <- page_cur %>%
-      html_elements("div.rlist.search-result__body.items-results") %>%
-      html_children()
+      rvest::html_elements("div.rlist.search-result__body.items-results") %>%
+      rvest::html_children()
 
     for (node in nodes) {
-      if (length(node %>% html_elements("div.issue-item__abstract__content")) == 0){
+      if (length(node %>% rvest::html_elements("div.issue-item__abstract__content")) == 0){
         abstract_cur <- c(abstract_cur,NA)
       }else{
-        abstract_cur <- c(abstract_cur,node %>% html_elements("div.issue-item__abstract__content") %>% html_text())
+        abstract_cur <- c(abstract_cur,node %>% rvest::html_elements("div.issue-item__abstract__content") %>% rvest::html_text())
       }
     }
     info_extracted_cur[["abstract_cur"]] <- stringr::str_sub(abstract_cur, 9, -1) # remove the first word (Abstract)
@@ -121,7 +121,7 @@ parse_res_sj <- function(url, page, n, limit_per_search) {
       unlist() %>%
       unique() %>%
       length()
-    assert_that(n_unique_length == 1)
+    assertthat::assert_that(n_unique_length == 1)
 
 
     # assert 2: check if the length is of expected value
@@ -129,7 +129,7 @@ parse_res_sj <- function(url, page, n, limit_per_search) {
     # the LAST page, so cannot do this number check if it is the last page
     n_effective_from_webpage <- length(info_extracted_cur[['abstract_cur']])
     if (count_remain >= n_effective_from_webpage) {
-        assert_that(length(info_extracted_cur$title_cur) == n_expected_from_webpage)
+        assertthat::assert_that(length(info_extracted_cur$title_cur) == n_expected_from_webpage)
         n_expected_to_add <- n_expected_from_webpage # the number of records to add within this batch
     } else { # in this situation, we expect a truncation
       # if (k == num_page_total){
@@ -148,12 +148,12 @@ parse_res_sj <- function(url, page, n, limit_per_search) {
 
     # save this batch of information
     for (k in names(info_extracted)) {
-      info_extracted[[k]] <- c(info_extracted[[k]], info_extracted_cur[[glue("{k}_cur")]])
+      info_extracted[[k]] <- c(info_extracted[[k]], info_extracted_cur[[glue::glue("{k}_cur")]])
     }
 
     count_done <- count_done + n_expected_to_add
     count_remain <- count_remain - n_expected_to_add
-    print(glue("Done: {count_done}/{n_expected_to_return}"))
+    print(glue::glue("Done: {count_done}/{n_expected_to_return}"))
   }
 
   return(data.frame(info_extracted, stringsAsFactors = F))

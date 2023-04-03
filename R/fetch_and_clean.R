@@ -35,12 +35,12 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
     url_sj <- get_url(keyword_encoded, field, db, start_year=start_year, end_year=end_year, additional_args=additional_args)
     print(url_sj)
     download.file(url = url_sj, destfile = "scrapedpage.html", quiet = TRUE)
-    page <- read_html("scrapedpage.html")
+    page <- xml2::read_html("scrapedpage.html")
     closeAllConnections()
 
     n <- page %>%
-      html_element('span.result__count') %>%
-      html_text() %>%
+      rvest::html_element('span.result__count') %>%
+      rvest::html_text() %>%
       # str_sub(2, -2) %>% # delete parenthese
       as.numeric()
 
@@ -49,7 +49,7 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
       next
     } else {
       df_db <- parse_res_sj(url_sj, page, n, limit_per_search) %>%
-        mutate(search_term = keyword_original, database = db)
+        dplyr::mutate(search_term = keyword_original, database = db)
       if (no_duplicate) {
         title_tmp <- tolower(gsub("[^[:alnum:]]", "", df_db$title))
         df_db <- df_db[!duplicated(title_tmp), ]
@@ -64,15 +64,15 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
 
     url_sd <- get_url(keyword_encoded, field, db, api_key = sdkey, start_year=start_year, end_year=end_year, additional_args=additional_args)
 
-    page <- read_html(url_sd)
+    page <- xml2::read_html(url_sd)
     n <- page %>%
-      html_nodes("totalresults") %>%
-      html_text() %>%
+      rvest::html_nodes("totalresults") %>%
+      rvest::html_text() %>%
       as.numeric()
 
     if (n > 0) {
       df_db <- parse_res_sd(page, n, limit_per_search) %>%
-        mutate(search_term = keyword_original, database = db)
+        dplyr::mutate(search_term = keyword_original, database = db)
       if (no_duplicate) {
         title_tmp <- tolower(gsub("[^[:alnum:]]", "", df_db$title))
         df_db <- df_db[!duplicated(title_tmp), ]
@@ -89,7 +89,7 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
 
     if (n > 0) {
       df_db <- parse_res_pm(res, n, limit_per_search) %>%
-        mutate(search_term = keyword_original, database = db)
+        dplyr::mutate(search_term = keyword_original, database = db)
       if (no_duplicate) {
         title_tmp <- tolower(gsub("[^[:alnum:]]", "", df_db$title))
         df_db <- df_db[!duplicated(title_tmp), ]
@@ -107,15 +107,15 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
 
       url_pq <- get_url(keyword, field, db, start_year=start_year, end_year=end_year, additional_args=additional_args)
       print(url_pq)
-      page_pq <- read_html(url_pq)
+      page_pq <- xml2::read_html(url_pq)
       n <- page_pq %>%
-        html_nodes("numberofrecords") %>%
-        html_text() %>%
+        rvest::html_nodes("numberofrecords") %>%
+        rvest::html_text() %>%
         as.numeric()
 
       type <- page_pq %>%
-        html_nodes('[tag="513"]') %>%
-        html_text() %>%
+        rvest::html_nodes('[tag="513"]') %>%
+        rvest::html_text() %>%
         tolower()
 
       count_done <- 0
@@ -128,34 +128,34 @@ fetch_and_clean <- function(keyword, field, db, sdkey, no_duplicate, limit_per_s
 
           url_pq_cur <- get_url(keyword, field, db, start_record = length(type) * (i - 1) + 1, start_year=start_year, end_year=end_year, additional_args=additional_args)
 
-          page_pq_cur <- read_html(url_pq_cur)
+          page_pq_cur <- xml2::read_html(url_pq_cur)
           type_cur <- page_pq_cur %>%
-            html_nodes('[tag="513"]') %>%
-            html_text() %>%
+            rvest::html_nodes('[tag="513"]') %>%
+            rvest::html_text() %>%
             tolower()
-          type_cur <- str_detect(type_cur, "journal|feature|article|case|study|periodical|literature|statistics")
+          type_cur <- stringr::str_detect(type_cur, "journal|feature|article|case|study|periodical|literature|statistics")
 
           if (count_done + sum(type_cur) <= limit_per_search) {
             count_done <- count_done + sum(type_cur)
             df_subdb_cur <- parse_res_pq(page_pq_cur, sum(type_cur), limit_per_search, type_cur) %>%
-              mutate(search_term = keyword_original, database = db)
+              dplyr::mutate(search_term = keyword_original, database = db)
             df_subdb <- rbind(df_subdb, df_subdb_cur)
           } else {
             df_subdb_cur <- parse_res_pq(page_pq_cur, sum(type_cur), limit_per_search - count_done, type_cur) %>%
-              mutate(search_term = keyword_original, database = db)
+              dplyr::mutate(search_term = keyword_original, database = db)
             df_subdb <- rbind(df_subdb, df_subdb_cur)
             print("Finish collecting required amount of records.")
             break
           }
         }
       } else {
-        type <- str_detect(type, "journal|feature|article|case|study|periodical|literature|statistics")
+        type <- stringr::str_detect(type, "journal|feature|article|case|study|periodical|literature|statistics")
 
         n <- length(which(type))
 
         if (n > 0) {
           df_subdb <- parse_res_pq(page_pq, n, limit_per_search, type) %>%
-            mutate(search_term = keyword_original, database = db)
+            dplyr::mutate(search_term = keyword_original, database = db)
         } else {
           print("Total results: 0")
           next

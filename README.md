@@ -21,10 +21,10 @@ The web scrapper automatically
 
 Supported databases as of 2023-04-03, for ONE or MULTIPLE sets of keywords:
 - PubMed (`pubmed`)
-- Sage Journals (`sage_journal`): note that you may want to use filter **Article Type** to include only the research articles for your work (there are other types such as review article) by `search_database(...,additional_args=list(ContentItemType='research-article'))`
+- Sage Journals (`sage_journal`): you may want to use filter **Article Type** to include only the research articles for your work (there are other types such as review article) by `search_database(...,additional_args=list(ContentItemType='research-article'))`
 
 Supported databases as of 2023-04-04, for ONE set of keywords:
-- ProQuest (`proquest`)
+- ProQuest (`proquest`): you need to provide a string or a vector of **sub-databases** to param `subdb_proquest` for the sub-databases to search; if you do not know which ones are available, use function `get_proquest_subdb()`
 
 Databases that need code update as of 2023-04-03:
 - Science Direct (`science_direct`)

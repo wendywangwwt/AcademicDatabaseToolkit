@@ -18,7 +18,7 @@ l_field <- list(
 )
 
 
-subdb_pq <- c(
+SUBDB_PQ <- c(
   "politicalscience",
   "publichealth",
   "psychology",
@@ -56,6 +56,9 @@ subdb_pq <- c(
 #'   `sage_journal`, `science_direct`, `pubmed`, `proquest`
 #'   If both correct and wrong database names are specified, only the correct ones
 #'   will be queried.
+#' @param subdb_proquest A string or a vector of sub databases in proquest
+#'   to query. You can use `get_proquest_subdb()` to retrieve a vector of all subscribed
+#'   sub-databases, then pass the ones needed to this argument.
 #' @param field The field to search for the keywords. Currently support:
 #'   `abstract`, `all`
 #'   Some databases may not support some field to be used in the search.
@@ -75,7 +78,7 @@ search_database <- function(keywords,
                             relationship = "or",
                             field = "abstract",
                             database_name = c("sage_journal", "science_direct", "pubmed", "proquest"),
-                            sdkey = "",
+                            subdb_proquest = SUBDB_PQ, sdkey = "",
                             start_year = NULL, end_year = NULL, additional_args = list(),
                             limit_per_search = NULL,
                             drop_duplicate = T, availability_pubmed = F) {
@@ -115,7 +118,7 @@ search_database <- function(keywords,
       print(glue::glue("\nStart current stage ({num_stage_cur}/{num_stage}):"))
       print(glue::glue('Keyword: {paste(keywords,collapse=", ")}; Database: {db}; Field: {field}'))
 
-      df_db <- fetch_and_clean(keywords, field, db, sdkey, drop_duplicate, limit_per_search)
+      df_db <- fetch_and_clean(keywords, field, db, subdb_proquest, sdkey, drop_duplicate, limit_per_search)
     } else {
       df_db <- data.frame(stringsAsFactors = F)
 
@@ -132,7 +135,7 @@ search_database <- function(keywords,
 
         keyword <- df_keywords[i,] %>% unlist() %>% unname()
         df_db_kw <- fetch_and_clean(
-          keyword, field, db, sdkey, drop_duplicate, limit_per_search,
+          keyword, field, db, subdb_proquest, sdkey, drop_duplicate, limit_per_search,
           start_year, end_year, additional_args
         )
         df_db <- dplyr::bind_rows(df_db, df_db_kw)

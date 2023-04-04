@@ -9,6 +9,7 @@ search_database(
   relationship = "or",
   field = "abstract",
   database_name = c("sage_journal", "science_direct", "pubmed", "proquest"),
+  subdb_proquest = SUBDB_PQ,
   sdkey = "",
   start_year = NULL,
   end_year = NULL,
@@ -46,6 +47,10 @@ database names. Default to \code{sage_journal}. Currently support:
 \code{sage_journal}, \code{science_direct}, \code{pubmed}, \code{proquest}
 If both correct and wrong database names are specified, only the correct ones
 will be queried.}
+
+\item{subdb_proquest}{A string or a vector of sub databases in proquest
+to query. You can use \code{get_proquest_subdb()} to retrieve a vector of all subscribed
+sub-databases, then pass the ones needed to this argument.}
 
 \item{sdkey}{API key for science direct.}
 

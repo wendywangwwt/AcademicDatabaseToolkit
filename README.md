@@ -23,10 +23,11 @@ Supported databases as of 2023-04-03, for ONE or MULTIPLE sets of keywords:
 - PubMed (`pubmed`)
 - Sage Journals (`sage_journal`): note that you may want to use filter **Article Type** to include only the research articles for your work (there are other types such as review article) by `search_database(...,additional_args=list(ContentItemType='research-article'))`
 
+Supported databases as of 2023-04-04, for ONE set of keywords:
+- ProQuest (`proquest`)
 
 Databases that need code update as of 2023-04-03:
 - Science Direct (`science_direct`)
-- ProQuest (`proquest`)
 
 Current development work focuses on implementing the automated search of MULTIPLE sets of keywords. This is the scenario where each concept can be described with slightly or largely different words/phrases, and the need is to search for articles that involves at least one keyword from each concept (relationship=`or`).
 
@@ -92,6 +93,10 @@ df_data <- search_databases(keywords,relationship='or',database_name=database_na
 
     
 ## Change log
+2023-04-04:
+- added support for one set of keywords in proquest
+- added tests for proquest
+
 2023-04-03:
 - re-factored the code into an R package that can be installed from GitHub, for pubmed & sage journals
 - added tests for pubmed and sage journals

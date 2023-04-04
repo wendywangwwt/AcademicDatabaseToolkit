@@ -8,6 +8,7 @@ fetch_and_clean(
   keyword,
   field,
   db,
+  subdb_proquest,
   sdkey,
   no_duplicate,
   limit_per_search = NULL,
@@ -27,6 +28,9 @@ Some databases may not support some field to be used in the search.}
 Currently support: \code{sage_journal}, \code{science_direct}, \code{pubmed}, \code{proquest}
 If both correct and wrong database names are specified, only the correct ones
 will be queried.}
+
+\item{subdb_proquest}{A string or a vector of sub databases in proquest
+to query.}
 
 \item{sdkey}{API key for science direct.}
 

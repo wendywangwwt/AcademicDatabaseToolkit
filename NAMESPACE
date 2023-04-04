@@ -2,5 +2,6 @@
 
 export("%>%")
 export(fetch_and_clean)
+export(get_proquest_subdb)
 export(search_database)
 importFrom(magrittr,"%>%")

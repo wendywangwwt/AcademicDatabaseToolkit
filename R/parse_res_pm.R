@@ -1,5 +1,3 @@
-
-
 #' Parse search results from PubMed
 #'
 #' @description
@@ -14,7 +12,7 @@
 
 parse_res_pm <- function(res, n, limit_per_search) {
   maxsize_db <- 200
-  limit_per_search <- min(n,limit_per_search) # make sure the number is valid, i.e., no larger than total
+  limit_per_search <- min(n, limit_per_search) # make sure the number is valid, i.e., no larger than total
 
   n_total <- n # the total number of search results
   n_expected_to_return <- ifelse(!is.null(limit_per_search) & (limit_per_search < n), limit_per_search, n) # the possibly truncated number of results to return
@@ -80,10 +78,10 @@ parse_res_pm <- function(res, n, limit_per_search) {
 
       # authorlist - there can be retraction article where the authorlist is empty
       count <- 0
-      for (node in nodes){
+      for (node in nodes) {
         count <- count + 1
-        author_list <- node %>% rvest::html_element('authorlist')
-        if (length(author_list) == 0){
+        author_list <- node %>% rvest::html_element("authorlist")
+        if (length(author_list) == 0) {
           idx_invalid <- c(idx_invalid, count)
         }
       }
@@ -92,19 +90,18 @@ parse_res_pm <- function(res, n, limit_per_search) {
         idx_invalid <- unique(idx_invalid) # to prevent both checks return the same id
         print(glue::glue("Encountered {length(idx_invalid)} non-journal articles. Removing and re-querying..."))
 
-        for (idx_invalid_cur in idx_invalid){
-          print(nodes[idx_invalid_cur] %>% rvest::html_element('pmid') %>% rvest::html_text())
-          print(nodes[idx_invalid_cur] %>% rvest::html_element('articletitle') %>% rvest::html_text())
+        for (idx_invalid_cur in idx_invalid) {
+          print(nodes[idx_invalid_cur] %>% rvest::html_element("pmid") %>% rvest::html_text())
+          print(nodes[idx_invalid_cur] %>% rvest::html_element("articletitle") %>% rvest::html_text())
         }
 
-        ids_total <- ids_total[-((k-1)*maxsize_db + idx_invalid)]
-        if (n_expected_to_return > length(ids_total)){
+        ids_total <- ids_total[-((k - 1) * maxsize_db + idx_invalid)]
+        if (n_expected_to_return > length(ids_total)) {
           n_expected_to_return <- length(ids_total)
           n <- length(ids_total)
           n_total <- length(ids_total)
           count_remain <- length(ids_total)
           limit_per_search <- length(ids_total)
-
         }
         ids <- ids_total[1:n_expected_to_return]
 
@@ -121,7 +118,7 @@ parse_res_pm <- function(res, n, limit_per_search) {
       author = c(),
       abstract = c(),
       year = c(),
-      availability = rep(NA,n_expected_to_return) # PubMed response does not have article availability info
+      availability = rep(NA, n_expected_to_return) # PubMed response does not have article availability info
     )
 
     # title
@@ -135,25 +132,25 @@ parse_res_pm <- function(res, n, limit_per_search) {
       rvest::html_text() %>%
       as.numeric()
 
-    nodes <- page_cur %>% rvest::html_elements('pubmedarticle')
-    for (node in nodes){
+    nodes <- page_cur %>% rvest::html_elements("pubmedarticle")
+    for (node in nodes) {
       # author
-      author_node <- node %>% rvest::html_elements('authorlist')
-      if (length(author_node) > 0){
+      author_node <- node %>% rvest::html_elements("authorlist")
+      if (length(author_node) > 0) {
         author_names <- paste(author_node %>% rvest::html_nodes("forename") %>% rvest::html_text(), author_node %>% rvest::html_nodes("lastname") %>% rvest::html_text(), collapse = ", ")
-      }else{
+      } else {
         author_names <- NA
       }
-      info_extracted_cur[["author_cur"]] <- c(info_extracted_cur[["author_cur"]],author_names)
+      info_extracted_cur[["author_cur"]] <- c(info_extracted_cur[["author_cur"]], author_names)
 
       # abstract
-      abstract_node <- node %>% rvest::html_elements('abstract')
-      if (length(abstract_node) > 0){
+      abstract_node <- node %>% rvest::html_elements("abstract")
+      if (length(abstract_node) > 0) {
         abstract <- abstract_node %>% rvest::html_text()
-      }else{
+      } else {
         abstract <- NA
       }
-      info_extracted_cur[["abstract_cur"]] <- c(info_extracted_cur[["abstract_cur"]],abstract)
+      info_extracted_cur[["abstract_cur"]] <- c(info_extracted_cur[["abstract_cur"]], abstract)
     }
 
 
@@ -187,82 +184,4 @@ parse_res_pm <- function(res, n, limit_per_search) {
   }
 
   return(data.frame(info_extracted, stringsAsFactors = F))
-
-
-
-
-
-
-
-  if (n <= maxsize_db) {
-    print(paste("Total results: ", n, sep = ""))
-    url_summary <- paste("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=",
-      paste(ids, collapse = ","),
-      "&rettype=text",
-      sep = ""
-    )
-    page_summary <- xml2::read_html(url_summary)
-    title <- page_summary %>%
-      rvest::html_nodes("articletitle") %>%
-      rvest::html_text()
-    year <- page_summary %>%
-      rvest::html_nodes('pubmedpubdate[pubstatus="pubmed"] year') %>%
-      rvest::html_text() %>%
-      as.numeric()
-    article_nodes <- page_summary %>% rvest::html_nodes("article")
-    author <- c()
-    abstract <- c()
-    for (article_node in article_nodes) {
-      author <- c(author, paste(article_node %>% rvest::html_nodes("forename") %>% rvest::html_text(), article_node %>% rvest::html_nodes("lastname") %>% rvest::html_text(), collapse = ", "))
-      abstract_now <- article_node %>%
-        rvest::html_nodes("abstract") %>%
-        rvest::html_text()
-      abstract <- if (length(abstract_now) > 0) c(abstract, abstract_now) else c(abstract, "No abstract")
-    }
-
-    print(paste("Done: ", n, "/", n, sep = ""))
-  } else {
-    title <- c()
-    author <- c()
-    abstract <- c()
-    year <- c()
-    count_done <- 0
-    time_query <- Sys.time()
-
-    for (k in 1:num_page) {
-      ids_cur <- if (k < num_page) ids[seq((1 + maxsize_db * (k - 1)), maxsize_db * k)] else ids[seq((1 + maxsize_db * (k - 1)), length(ids))]
-      url_summary_cur <- paste("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=",
-        paste(ids_cur, collapse = ","),
-        "&rettype=text",
-        sep = ""
-      )
-      page_cur <- xml2::read_html(url_summary_cur)
-      title_cur <- page_cur %>%
-        rvest::html_nodes("articletitle") %>%
-        rvest::html_text()
-      year_cur <- page_cur %>%
-        rvest::html_nodes('pubmedpubdate[pubstatus="pubmed"] year') %>%
-        rvest::html_text() %>%
-        as.numeric()
-      article_nodes_cur <- page_cur %>% rvest::html_nodes("pubmedarticle")
-      author_cur <- c()
-      abstract_cur <- c()
-      for (article_node_cur in article_nodes_cur) {
-        count_done <- count_done + 1
-        author_cur <- c(author_cur, paste(article_node_cur %>% rvest::html_nodes("forename") %>% rvest::html_text(), article_node_cur %>% rvest::html_nodes("lastname") %>% rvest::html_text(), collapse = ", "))
-        abstract_cur_now <- article_node_cur %>%
-          rvest::html_nodes("abstract") %>%
-          rvest::html_text()
-        abstract_cur <- if (length(abstract_cur_now) > 0) c(abstract_cur, abstract_cur_now) else c(abstract_cur, "No abstract")
-      }
-
-      title <- c(title, title_cur)
-      author <- c(author, author_cur)
-      abstract <- c(abstract, abstract_cur)
-      year <- c(year, year_cur)
-      print(paste("Done: ", count_done, "/", n, sep = ""))
-    }
-  }
-  closeAllConnections()
-  return(data.frame(title = title, author = author, year = year, abstract = abstract, link = link, availability = rep(NA, length(title)), stringsAsFactors = F))
 }
